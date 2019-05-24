@@ -1,0 +1,13 @@
+diff --git a/configure b/configure
+index 35c9db5..2283098 100755
+--- a/configure
++++ b/configure
+@@ -1529,7 +1529,7 @@ fi
+ 
+ if test "x$LTSHARED" != xno  -o  "x$LTSTATIC" != xno; then
+   USELIBTOOL="yes"
+-  LIBTOOL="./libtool"
++  LIBTOOL="libtool"
+   O="lo"
+   A="la"
+   LN='$(LIBTOOL) --mode=link $(CC)'

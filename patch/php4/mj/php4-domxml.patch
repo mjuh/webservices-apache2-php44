@@ -1,0 +1,25 @@
+diff --git a/ext/domxml/config.m4 b/ext/domxml/config.m4
+index 4db40fc..8760edf 100644
+--- a/ext/domxml/config.m4
++++ b/ext/domxml/config.m4
+@@ -53,9 +53,9 @@ if test "$PHP_DOM" != "no"; then
+   if test -f $DOMXML_DIR/lib/libxml2.a -o -f $DOMXML_DIR/lib/libxml2.$SHLIB_SUFFIX_NAME ; then
+     DOM_LIBNAME=xml2
+   else
+-    DOM_LIBNAME=xml
++    DOM_LIBNAME=xml2
+   fi
+-
++  
+   XML2_CONFIG=$DOMXML_DIR/bin/xml2-config
+  
+   if test -x $XML2_CONFIG; then
+@@ -148,7 +148,7 @@ if test "$PHP_DOM_XSLT" != "no"; then
+   if test -f $DOMXML_DIR/lib/libxml2.a -o -f $DOMXML_DIR/lib/libxml2.$SHLIB_SUFFIX_NAME ; then
+     DOM_LIBNAME=xml2
+   else
+-    DOM_LIBNAME=xml
++    DOM_LIBNAME=xml2
+   fi
+ 
+   PHP_ADD_LIBRARY_WITH_PATH($DOM_LIBNAME, $DOMXML_DIR/lib, DOMXML_SHARED_LIBADD)

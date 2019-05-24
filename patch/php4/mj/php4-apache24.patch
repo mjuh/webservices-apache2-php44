@@ -1,0 +1,135 @@
+diff --git a/configure.in b/configure.in
+index 19961db..67e4fee 100644
+--- a/configure.in
++++ b/configure.in
+@@ -1445,6 +1445,21 @@ cat <<X
+ X
+   fi
+ 
++  if test "$PHP_SAPI" = "apache2handler" || test "$PHP_SAPI" = "apache2filter"; then
++    if test "$APACHE_VERSION" -ge 2004001; then
++      if test -z "$APACHE_THREADED_MPM"; then
++cat <<X
+++--------------------------------------------------------------------+
++|                        *** WARNING ***                             |
++|                                                                    |
++| You have built PHP for Apache's current non-threaded MPM.          |
++| If you change Apache to use a threaded MPM you must reconfigure    |
++| PHP with --enable-maintainer-zts                                   |
++X
++      fi
++    fi
++  fi
++
+   # Warn about linking Apache with libpthread if oci8 extension is enabled on linux.
+   if test "$PHP_OCI8" != "no" -o "$PHP_ORACLE" != "no"; then
+     if test "$PHP_SAPI" = "apache"; then
+diff --git a/sapi/apache2filter/config.m4 b/sapi/apache2filter/config.m4
+index 03cb787..25c1032 100644
+--- a/sapi/apache2filter/config.m4
++++ b/sapi/apache2filter/config.m4
+@@ -36,7 +36,6 @@ AC_ARG_WITH(apxs2filter,
+   APXS_BINDIR=`$APXS -q BINDIR`
+   APXS_HTTPD=`$APXS -q SBINDIR`/`$APXS -q TARGET`
+   APXS_CFLAGS=`$APXS -q CFLAGS`
+-  APXS_MPM=`$APXS -q MPM_NAME`
+   APU_BINDIR=`$APXS -q APU_BINDIR`
+   APR_BINDIR=`$APXS -q APR_BINDIR`
+ 
+@@ -115,8 +114,16 @@ AC_ARG_WITH(apxs2filter,
+     ;;
+   esac
+ 
+-  if test "$APXS_MPM" != "prefork"; then
+-    PHP_BUILD_THREAD_SAFE
++  if test "$APACHE_VERSION" -lt 2004001; then
++    APXS_MPM=`$APXS -q MPM_NAME`
++    if test "$APXS_MPM" != "prefork" && test "$APXS_MPM" != "peruser" && test "$APXS_MPM" != "itk"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
++  else
++    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
++    if test -n "$APACHE_THREADED_MPM"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
+   fi
+   AC_MSG_RESULT(yes)
+ 
+diff --git a/sapi/apache2handler/config.m4 b/sapi/apache2handler/config.m4
+index 55ad49f..b0bedb8 100644
+--- a/sapi/apache2handler/config.m4
++++ b/sapi/apache2handler/config.m4
+@@ -35,7 +35,6 @@ AC_ARG_WITH(apxs2,
+   APXS_BINDIR=`$APXS -q BINDIR`
+   APXS_HTTPD=`$APXS -q SBINDIR`/`$APXS -q TARGET`
+   APXS_CFLAGS=`$APXS -q CFLAGS`
+-  APXS_MPM=`$APXS -q MPM_NAME`
+   APU_BINDIR=`$APXS -q APU_BINDIR`
+   APR_BINDIR=`$APXS -q APR_BINDIR`
+ 
+@@ -114,8 +113,16 @@ AC_ARG_WITH(apxs2,
+     ;;
+   esac
+ 
+-  if test "$APXS_MPM" != "prefork"; then
+-    PHP_BUILD_THREAD_SAFE
++  if test "$APACHE_VERSION" -lt 2004001; then
++    APXS_MPM=`$APXS -q MPM_NAME`
++    if test "$APXS_MPM" != "prefork" && test "$APXS_MPM" != "peruser" && test "$APXS_MPM" != "itk"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
++  else
++    APACHE_THREADED_MPM=`$APXS_HTTPD -V | grep 'threaded:.*yes'`
++    if test -n "$APACHE_THREADED_MPM"; then
++      PHP_BUILD_THREAD_SAFE
++    fi
+   fi
+   AC_MSG_RESULT(yes)
+  
+diff --git a/sapi/apache2handler/php_functions.c b/sapi/apache2handler/php_functions.c
+index b7abf8e..86f0d4c 100644
+--- a/sapi/apache2handler/php_functions.c
++++ b/sapi/apache2handler/php_functions.c
+@@ -324,7 +324,11 @@ PHP_FUNCTION(apache_getenv)
+ 
+ static char *php_apache_get_version()
+ {
++#if MODULE_MAGIC_NUMBER_MAJOR >= 20060905
++	return (char *) ap_get_server_banner();
++#else
+ 	return (char *) ap_get_server_version();
++#endif
+ }
+ 
+ /* {{{ proto string apache_get_version(void)
+@@ -369,9 +373,13 @@ PHP_MINFO_FUNCTION(apache)
+ 	int n, max_requests;
+ 	char *p;
+ 	server_rec *serv = ((php_struct *) SG(server_context))->r->server;
+-#if !defined(WIN32) && !defined(WINNT)
++#if !defined(WIN32) && !defined(WINNT) && !defined(NETWARE)
++#if MODULE_MAGIC_NUMBER_MAJOR >= 20081201
++	AP_DECLARE_DATA extern unixd_config_rec ap_unixd_config;
++#else
+ 	AP_DECLARE_DATA extern unixd_config_rec unixd_config;
+ #endif
++#endif
+ 	
+ 	for (n = 0; ap_loaded_modules[n]; ++n) {
+ 		char *s = (char *) ap_loaded_modules[n]->name;
+@@ -399,9 +407,13 @@ PHP_MINFO_FUNCTION(apache)
+ 	
+ 	snprintf(tmp, sizeof(tmp), "%s:%u", serv->server_hostname, serv->port);
+ 	php_info_print_table_row(2, "Hostname:Port", tmp);
+-	
+-#if !defined(WIN32) && !defined(WINNT)
++
++#if !defined(WIN32) && !defined(WINNT) && !defined(NETWARE)
++#if MODULE_MAGIC_NUMBER_MAJOR >= 20081201
++	snprintf(tmp, sizeof(tmp), "%s(%d)/%d", ap_unixd_config.user_name, ap_unixd_config.user_id, ap_unixd_config.group_id);
++#else
+ 	snprintf(tmp, sizeof(tmp), "%s(%d)/%d", unixd_config.user_name, unixd_config.user_id, unixd_config.group_id);
++#endif
+ 	php_info_print_table_row(2, "User/Group", tmp);
+ #endif
+ 
