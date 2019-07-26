@@ -275,7 +275,7 @@ sh = dash.overrideAttrs (_: rec {
 rootfs = mkRootfs {
   name = "apache2-php4-rootfs";
   src = ./rootfs;
-  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 postfix s6 execline zendoptimizer connectorc;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 postfix s6 execline zendoptimizer connectorc mjperl5Packages;
   ioncube = ioncube.v44;
   s6PortableUtils = s6-portable-utils;
   s6LinuxUtils = s6-linux-utils;
