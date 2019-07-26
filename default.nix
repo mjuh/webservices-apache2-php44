@@ -334,7 +334,7 @@ pkgs.dockerTools.buildLayeredImage rec {
     perl528Packages.LWP
     perl528Packages.ListMoreUtilsXS
     perl528Packages.LWPProtocolHttps
-  ]
+  ];
 # ++ collect isDerivation php4Packages;
   config = {
     Entrypoint = [ "${rootfs}/init" ];
