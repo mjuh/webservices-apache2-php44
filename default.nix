@@ -221,7 +221,7 @@ sh = dash.overrideAttrs (_: rec {
        --with-expat-dir=${expat}
        --with-kerberos
        --with-ttf
-       --with-config-file-scan-dir=/etc/php.d
+       --with-config-file-scan-dir=/run/php.d
        --with-pcre-regex=${pcre831}
        --with-imap=${uwimap}
        --with-imap-ssl
@@ -291,6 +291,7 @@ dockerArgHints = {
     tmpfs = [
       "/tmp:mode=1777"
       "/run/bin:exec,suid"
+      "/run/php.d"
     ];
     ulimits = [
       { name = "stack"; hard = -1; soft = -1; }
