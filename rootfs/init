@@ -15,7 +15,7 @@ foreground { s6-chmod 2555 /run/bin/postdrop }
 foreground { s6-chmod 111 /run/bin }
 foreground { cp @rootfs@/etc/php.d/* /run/php.d }
 importas PHP_INI_SCAN_DIR
-foreground { cp $PHP_INI_SCAN_DIR/* /run/php.d }
+foreground { cp $PHP_SECURITY/* /run/php.d }
 unexport PHP_INI_SCAN_DIR
 foreground { s6-hiercopy /etc/services.d /run/services.d }
 s6-svscan -t0 /run/services.d
