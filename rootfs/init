@@ -16,6 +16,6 @@ foreground { s6-chmod 111 /run/bin }
 foreground { s6-hiercopy @rootfs@/etc/php.d /run/php.d }
 importas PHP_SECURITY PHP_SECURITY
 foreground { s6-hiercopy $PHP_SECURITY /run/php.d }
-unexport PHP_INI_SCAN_DIR
+unexport PHP_SECURITY
 foreground { s6-hiercopy /etc/services.d /run/services.d }
 s6-svscan -t0 /run/services.d
