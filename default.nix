@@ -142,6 +142,7 @@ sh = dash.overrideAttrs (_: rec {
       doCheck = false;
       checkTarget = "test";
       buildInputs = [
+         postfix
          autoconf213
          automake
          pkgconfig
