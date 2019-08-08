@@ -9,7 +9,7 @@ let
 
 inherit (builtins) concatMap getEnv toJSON;
 inherit (dockerTools) buildLayeredImage;
-inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd buildPhpPackage mkRootfs;
+inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd mkRootfs;
 inherit (lib.attrsets) collect isDerivation;
 inherit (stdenv) mkDerivation;
 
@@ -24,103 +24,12 @@ sh = dash.overrideAttrs (_: rec {
   '';
 });
 
-  zendoptimizer = stdenv.mkDerivation rec {
-      name = "zend-optimizer-3.3.9";
-      src =  fetchurl {
-          url = "http://downloads.zend.com/optimizer/3.3.9/ZendOptimizer-3.3.9-linux-glibc23-x86_64.tar.gz";
-          sha256 = "1f7c7p9x9p2bjamci04vr732rja0l1279fvxix7pbxhw8zn2vi1d";
-      };
-      installPhase = ''
-                  mkdir -p  $out/
-                  tar zxvf  ${src} -C $out/ ZendOptimizer-3.3.9-linux-glibc23-x86_64/data/4_4_x_comp/ZendOptimizer.so
-      '';
-  };
-
-  pcre831 = stdenv.mkDerivation rec {
-      name = "pcre-8.31";
-      src = fetchurl {
-          url = "https://ftp.pcre.org/pub/pcre/${name}.tar.bz2";
-          sha256 = "0g4c0z4h30v8g8qg02zcbv7n67j5kz0ri9cfhgkpwg276ljs0y2p";
-      };
-      outputs = [ "out" ];
-      configureFlags = ''
-          --enable-jit
-      '';
-  };
-
-  libjpegv6b = stdenv.mkDerivation rec {
-     name = "libjpeg-6b";
-     src = fetchurl {
-         url = "http://www.ijg.org/files/jpegsrc.v6b.tar.gz";
-         sha256 = "0pg34z6rbkk5kvdz6wirf7g4mdqn5z8x97iaw17m15lr3qjfrhvm";
-     };
-     buildInputs = [ nasm libtool autoconf213 coreutils ];
-     doCheck = true;
-     checkTarget = "test";
-     configureFlags = ''
-          --enable-static
-          --enable-shared
-     '';
-     preBuild = ''
-          mkdir -p $out/lib
-          mkdir -p $out/bin
-          mkdir -p $out/man/man1
-          mkdir -p $out/include
-     '';
-     preInstall = ''
-          mkdir -p $out/lib
-          mkdir -p $out/bin
-          mkdir -p $out/man/man1
-          mkdir -p $out/include
-     '';
-      patches = [
-       ./patch/jpeg6b.patch
-      ];
-  };
-
-  libpng12 = stdenv.mkDerivation rec {
-     name = "libpng-1.2.59";
-     src = fetchurl {
-        url = "mirror://sourceforge/libpng/${name}.tar.xz";
-        sha256 = "b4635f15b8adccc8ad0934eea485ef59cc4cae24d0f0300a9a941e51974ffcc7";
-     };
-     buildInputs = [ zlib ];
-     doCheck = true;
-     checkTarget = "test";
-  };
-
-  connectorc = stdenv.mkDerivation rec {
-     name = "mariadb-connector-c-${version}";
-     version = "6.1.0";
-
-     src = fetchurl {
-         url = "https://downloads.mysql.com/archives/get/file/mysql-connector-c-6.1.0-src.tar.gz";
-         sha256 = "0cifddg0i8zm8p7cp13vsydlpcyv37mz070v6l2mnvy0k8cng2na";
-         name   = "mariadb-connector-c-${version}-src.tar.gz";
-     };
-
-  # outputs = [ "dev" "out" ]; FIXME: cmake variables don't allow that < 3.0
-     cmakeFlags = [
-            "-DWITH_EXTERNAL_ZLIB=ON"
-            "-DMYSQL_UNIX_ADDR=/run/mysqld/mysqld.sock"
-     ];
-
-  # The cmake setup-hook uses $out/lib by default, this is not the case here.
-     preConfigure = stdenv.lib.optionalString stdenv.isDarwin ''
-             cmakeFlagsArray+=("-DCMAKE_INSTALL_NAME_DIR=$out/lib/mariadb")
-     '';
-
-     nativeBuildInputs = [ cmake ];
-     propagatedBuildInputs = [ openssl zlib ];
-     buildInputs = [ libiconv ];
-     enableParallelBuilding = true;
-  };
-
 rootfs = mkRootfs {
   name = "apache2-php4-rootfs";
   src = ./rootfs;
-  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 postfix s6 execline zendoptimizer connectorc mjperl5Packages;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 postfix s6 execline mjperl5Packages;
   ioncube = ioncube.v44;
+  zendoptimizer = zendoptimizer.v44;
   s6PortableUtils = s6-portable-utils;
   s6LinuxUtils = s6-linux-utils;
   mimeTypes = mime-types;
