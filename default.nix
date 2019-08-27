@@ -54,8 +54,7 @@ dockerArgHints = {
     cap_add = [ "SYS_ADMIN" ];
     volumes = [
       ({ type = "bind"; source =  "$SITES_CONF_PATH" ; target = "/read/sites-enabled"; read_only = true; })
-      ({ type = "bind"; source =  "/etc/passwd" ; target = "/etc/passwd"; read_only = true; })
-      ({ type = "bind"; source =  "/etc/group" ; target = "/etc/group"; read_only = true; })
+      ({ type = "bind"; source =  "/opt/etc"; target = "/opt/etc"; read_only = true;})
       ({ type = "bind"; source = "/opcache"; target = "/opcache"; })
       ({ type = "bind"; source = "/home"; target = "/home"; })
       ({ type = "bind"; source = "/opt/postfix/spool/maildrop"; target = "/var/spool/postfix/maildrop"; })
