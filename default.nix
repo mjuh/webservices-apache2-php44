@@ -1,3 +1,5 @@
+{}:
+
 with import <nixpkgs> {
   overlays = [
     (import (builtins.fetchGit { url = "git@gitlab.intr:_ci/nixpkgs.git"; ref = "refactor"; }))
@@ -14,7 +16,7 @@ inherit (lib.attrsets) collect isDerivation;
 inherit (stdenv) mkDerivation;
 
 rootfs = mkRootfs {
-  name = "apache2-php44-rootfs";
+  name = "apache2-php4-rootfs";
   src = ./rootfs;
   inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 sendmail s6 execline;
   mjperl5Packages = mjperl5lib;
@@ -34,7 +36,7 @@ dockerArgHints = {
     tmpfs = [
       "/tmp:mode=1777"
       "/run/bin:exec,suid"
-      "/run/php44.d:mode=644"
+      "/run/php4.d:mode=644"
     ];
     ulimits = [
       { name = "stack"; hard = -1; soft = -1; }
@@ -59,7 +61,7 @@ in
 
 pkgs.dockerTools.buildLayeredImage rec {
   maxLayers = 124;
-  name = "docker-registry.intr/webservices/apache2-php44";
+  name = "docker-registry.intr/webservices/apache2-php4";
   tag = if gitAbbrev != "" then gitAbbrev else "latest";
   contents = [
     rootfs
