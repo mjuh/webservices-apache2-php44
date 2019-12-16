@@ -4,8 +4,8 @@ with import <nixpkgs> {
   ];
 };
 
-maketestPhp {
-  php = php4;
-  image = callPackage ./default.nix {};
-  rootfs = ./rootfs;
-}
+#maketestPhp {
+#  php = php4;
+#  image = callPackage ./default.nix {};
+#  rootfs = ./rootfs;
+#}
