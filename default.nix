@@ -14,7 +14,7 @@ inherit (lib.attrsets) collect isDerivation;
 inherit (stdenv) mkDerivation;
 
 rootfs = mkRootfs {
-  name = "apache2-php4-rootfs";
+  name = "apache2-php44-rootfs";
   src = ./rootfs;
   inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 sendmail s6 execline;
   mjperl5Packages = mjperl5lib;
@@ -34,7 +34,7 @@ dockerArgHints = {
     tmpfs = [
       "/tmp:mode=1777"
       "/run/bin:exec,suid"
-      "/run/php4.d:mode=644"
+      "/run/php44.d:mode=644"
     ];
     ulimits = [
       { name = "stack"; hard = -1; soft = -1; }
@@ -59,7 +59,7 @@ in
 
 pkgs.dockerTools.buildLayeredImage rec {
   maxLayers = 124;
-  name = "docker-registry.intr/webservices/apache2-php4";
+  name = "docker-registry.intr/webservices/apache2-php44";
   tag = if gitAbbrev != "" then gitAbbrev else "latest";
   contents = [
     rootfs
@@ -104,6 +104,7 @@ pkgs.dockerTools.buildLayeredImage rec {
       mkdir -p usr/local
       mkdir -p opt
       ln -s ${php4} opt/php4
+      ln -s ${php4} opt/php44 
       ln -s /bin usr/sbin
       ln -s /bin usr/local/bin
     '';
