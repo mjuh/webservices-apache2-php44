@@ -1,6 +1,6 @@
 with import <nixpkgs> {
   overlays = [
-    (import (builtins.fetchGit { url = "git@gitlab.intr:_ci/nixpkgs.git"; ref = "master"; }))
+    (import (builtins.fetchGit { url = "git@gitlab.intr:_ci/nixpkgs.git"; ref = "refactor"; }))
   ];
 };
 
@@ -13,21 +13,10 @@ inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd mkRootfs;
 inherit (lib.attrsets) collect isDerivation;
 inherit (stdenv) mkDerivation;
 
-  locale = glibcLocales.override {
-      allLocales = false;
-      locales = ["en_US.UTF-8/UTF-8"];
-  };
-
-sh = dash.overrideAttrs (_: rec {
-  postInstall = ''
-    ln -s dash "$out/bin/sh"
-  '';
-});
-
 rootfs = mkRootfs {
   name = "apache2-php4-rootfs";
   src = ./rootfs;
-  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 postfix s6 execline;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php4 sendmail s6 execline;
   mjperl5Packages = mjperl5lib;
   ioncube = ioncube.v44;
   zendoptimizer = zendoptimizer.v44;
@@ -45,7 +34,7 @@ dockerArgHints = {
     tmpfs = [
       "/tmp:mode=1777"
       "/run/bin:exec,suid"
-      "/run/php.d:mode=644"
+      "/run/php4.d:mode=644"
     ];
     ulimits = [
       { name = "stack"; hard = -1; soft = -1; }
@@ -76,9 +65,18 @@ pkgs.dockerTools.buildLayeredImage rec {
     rootfs
     tzdata
     locale
-    postfix
+    sendmail
     sh
     coreutils
+    libjpeg_turbo
+    jpegoptim
+    (optipng.override{ inherit libpng ;})
+    gifsicle nss-certs.unbundled zip
+    gcc-unwrapped.lib
+    glibc
+    zlib
+    apacheHttpd
+    perl520
   ]
   ++ collect isDerivation mjperl5Packages ;
 # ++ collect isDerivation php4Packages;
@@ -96,4 +94,17 @@ pkgs.dockerTools.buildLayeredImage rec {
       ru.majordomo.docker.exec.reload-cmd = "${apacheHttpd}/bin/httpd -d ${rootfs}/etc/httpd -k graceful";
     };
   };
+    extraCommands = ''
+      set -xe
+      ls
+      mkdir -p etc
+      mkdir -p bin
+      chmod u+w usr
+      mkdir -p usr/local
+      mkdir -p opt
+      ln -s ${php4} opt/php4
+      ln -s /bin usr/sbin
+      ln -s /bin usr/local/bin
+    '';
+
 }
