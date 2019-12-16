@@ -99,6 +99,7 @@ pkgs.dockerTools.buildLayeredImage rec {
       ls
       mkdir -p etc
       mkdir -p bin
+      mkdir -p usr
       chmod u+w usr
       mkdir -p usr/local
       mkdir -p opt
