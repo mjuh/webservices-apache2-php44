@@ -2,10 +2,9 @@
 
 with import <nixpkgs> {
   overlays = [
-    (import (builtins.fetchGit { url = "git@gitlab.intr:_ci/nixpkgs.git"; ref = (getEnv "GIT_BRANCH"); }))
+    (import (builtins.fetchGit { url = "git@gitlab.intr:_ci/nixpkgs.git"; ref = (builtins.getEnv "GIT_BRANCH"); }))
   ];
 };
-
 
 let
 
