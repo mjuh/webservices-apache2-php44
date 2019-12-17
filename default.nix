@@ -78,6 +78,7 @@ pkgs.dockerTools.buildLayeredImage rec {
     zlib
     apacheHttpd
     perl520
+    mariadbConnectorC
   ]
   ++ collect isDerivation mjperl5Packages ;
 # ++ collect isDerivation php44Packages;
