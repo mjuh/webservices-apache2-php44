@@ -5,7 +5,7 @@ with import <nixpkgs> {
 };
 
 maketestPhp {
-  php = php4;
+  php = php44;
   image = callPackage ./default.nix {};
   rootfs = ./rootfs;
 }
