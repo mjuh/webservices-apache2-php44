@@ -18,7 +18,7 @@ inherit (stdenv) mkDerivation;
 rootfs = mkRootfs {
   name = "apache2-php44-rootfs";
   src = ./rootfs;
-  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php44 sendmail s6 execline;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php44 sendmail s6 execline zlib;
   mjperl5Packages = mjperl5lib;
   ioncube = ioncube.v44;
   zendoptimizer = zendoptimizer.v44;
