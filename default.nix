@@ -81,7 +81,7 @@ pkgs.dockerTools.buildLayeredImage rec {
     perl520
   ]
   ++ collect isDerivation mjperl5Packages ;
-# ++ collect isDerivation php4Packages;
+# ++ collect isDerivation php44Packages;
   config = {
     Entrypoint = [ "${rootfs}/init" ];
     Env = [
