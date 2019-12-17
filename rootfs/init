@@ -3,7 +3,7 @@
 
 foreground { s6-mount -o remount,hidepid=2,gid=0 proc /proc }
 
-foreground { cp @postfix@/bin/postdrop /run/bin/postdrop }
+foreground { cp @sendmail@/bin/postdrop /run/bin/postdrop }
 backtick POSTDROP_UID { stat --printf %u /var/spool/postfix/maildrop }
 backtick POSTDROP_GID { stat --printf %g /var/spool/postfix/maildrop }
 importas POSTDROP_UID POSTDROP_UID
