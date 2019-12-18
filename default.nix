@@ -1,4 +1,4 @@
-JOB_URL{}:
+{}:
 
 with import <nixpkgs> {
   overlays = [
