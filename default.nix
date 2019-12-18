@@ -8,7 +8,7 @@ with import <nixpkgs> {
 
 let
 
-inherit (builtins) concatMap getEnv toJSON;
+inherit (builtins) concatMap getEnv replaceStrings toJSON;
 inherit (dockerTools) buildLayeredImage;
 inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd mkRootfs;
 inherit (lib.attrsets) collect isDerivation;
