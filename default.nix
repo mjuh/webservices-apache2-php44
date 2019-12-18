@@ -55,7 +55,8 @@ dockerArgHints = {
   };
 
 gitAbbrev = firstNChars 8 (getEnv "GIT_COMMIT");
-#gitCommit = (getEnv "GIT_COMMIT");
+gitCommit = (getEnv "GIT_COMMIT");
+jenkinsJobUrl = (getEnv "JOB_URL");
 
 in 
 
@@ -95,8 +96,8 @@ pkgs.dockerTools.buildLayeredImage rec {
       ru.majordomo.docker.arg-hints-json = builtins.toJSON dockerArgHints;
       ru.majordomo.docker.cmd = dockerRunCmd dockerArgHints "${name}:${tag}";
       ru.majordomo.docker.exec.reload-cmd = "${apacheHttpd}/bin/httpd -d ${rootfs}/etc/httpd -k graceful";
-      ru.majordomo.ci.jenkins.job_url = builtins.getEnv "JOB_URL";
-      ru.majordomo.ci.gitlab.commit_url = "https://gitlab.intr/(builtins.getEnv "JOB_NAME")/commit/(builtins.getEnv "GIT_COMMIT")";
+      ru.majordomo.ci.jenkins.job_url = if jenkinsJobUrl != "" then jenkinsJobUrl else "none";
+#      ru.majordomo.ci.gitlab.commit_url = "https://gitlab.intr/(builtins.getEnv "JOB_NAME")/commit/(builtins.getEnv "GIT_COMMIT")";
     };
   };
     extraCommands = ''
