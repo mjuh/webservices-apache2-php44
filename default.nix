@@ -113,6 +113,7 @@ pkgs.dockerTools.buildLayeredImage rec {
       mkdir -p opt
       ln -s ${php44} opt/php4
       ln -s ${php44} opt/php44 
+      ln -s /bin usr/bin
       ln -s /bin usr/sbin
       ln -s /bin usr/local/bin
     '';
