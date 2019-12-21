@@ -10,4 +10,5 @@ maketestPhp {
   php = php44;
   image = callPackage ./default.nix { inherit ref; };
   rootfs = ./rootfs;
+  defaultTestSuite = false;
 }{}
