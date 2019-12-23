@@ -1,4 +1,4 @@
-{ ref ? "master" }:
+{ ref ? "master", debug ? false }:
 
 with import <nixpkgs> {
   overlays = [
@@ -10,12 +10,13 @@ let
   domain = "php44.ru";
   phpVersion = "php" + lib.versions.major php44.version
     + lib.versions.minor php44.version;
-  containerStructureTestConfig = ./container-structure-test.yaml;
+  containerStructureTestConfig = ./tests/container-structure-test.yaml;
   image = callPackage ./default.nix { inherit ref; };
 
 in maketestPhp {
   php = php44;
   inherit image;
+  inherit debug;
   rootfs = ./rootfs;
   inherit containerStructureTestConfig;
   defaultTestSuite = false;
@@ -40,13 +41,13 @@ in maketestPhp {
     (dockerNodeTest {
       description = "Copy JSON.php.";
       action = "succeed";
-      command = "cp -v ${./JSON.php} /home/u12/${domain}/www/JSON.php";
+      command = "cp -v ${./tests/JSON.php} /home/u12/${domain}/www/JSON.php";
     })
     (dockerNodeTest {
       description = "Copy phpinfo-json.php.";
       action = "succeed";
       command =
-        "cp -v ${./phpinfo-json.php} /home/u12/${domain}/www/phpinfo-json.php";
+        "cp -v ${./tests/phpinfo-json.php} /home/u12/${domain}/www/phpinfo-json.php";
     })
     (dockerNodeTest {
       description = "Fetch phpinfo-json.php.";
@@ -59,7 +60,7 @@ in maketestPhp {
       action = "succeed";
       command = testDiffPy {
         inherit pkgs;
-        sampleJson = (./. + "/${phpVersion}.json");
+        sampleJson = (./tests/. + "/${phpVersion}.json");
         output = "/tmp/xchg/coverage-data/deepdiff.html";
       };
     })
@@ -68,9 +69,9 @@ in maketestPhp {
       action = "succeed";
       command = testDiffPy {
         inherit pkgs;
-        sampleJson = (./. + "/${phpVersion}.json");
+        sampleJson = (./tests/. + "/${phpVersion}.json");
         output = "/tmp/xchg/coverage-data/deepdiff-with-excludes.html";
-        excludes = import ./diff-to-skip.nix;
+        excludes = import ./tests/diff-to-skip.nix;
       };
     })
     (dockerNodeTest {
