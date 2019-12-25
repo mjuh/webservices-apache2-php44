@@ -117,17 +117,17 @@ in maketestPhp {
     (dockerNodeTest {
       description = "Spiner test";
       action = "succeed";
-      command = "curl 127.0.0.1 | grep -m1 refresh ";
+      command = "curl -s 127.0.0.1 | grep -m1 refresh ";
     })
     (dockerNodeTest {
       description = "404 test";
       action = "succeed";
-      command = "curl 127.0.0.1/non-existent | grep -m1 ' 404' ";
+      command = "curl -s 127.0.0.1/non-existent | grep -m1 ' 404' ";
     })
     (dockerNodeTest {
       description = "404 mj-error test";
       action = "succeed";
-      command = "curl 127.0.0.1/non-existent | grep -m1 majordomo ";
+      command = "curl -s 127.0.0.1/non-existent | grep -m1 majordomo ";
     })
   ];
 } { }
