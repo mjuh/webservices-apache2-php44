@@ -117,17 +117,27 @@ in maketestPhp {
     (dockerNodeTest {
       description = "Spiner test";
       action = "succeed";
-      command = "curl -s 127.0.0.1 | grep -m1 refresh ";
+      command = runCurlGrep "127.0.0.1" "refresh";
     })
     (dockerNodeTest {
       description = "404 test";
       action = "succeed";
-      command = "curl -s 127.0.0.1/non-existent | grep -m1 ' 404' ";
+      command = runCurlGrep "127.0.0.1/non-existent" "' 404'";
     })
     (dockerNodeTest {
       description = "404 mj-error test";
       action = "succeed";
-      command = "curl -s 127.0.0.1/non-existent | grep -m1 majordomo ";
+      command = runCurlGrep "127.0.0.1/non-existent" "majordomo";
+    })
+    (dockerNodeTest {
+      description = "Copy mysqlconnect.php";
+      action = "succeed";
+      command = "cp -v ${./tests/mysqlconnect.php} /home/u12/${domain}/www/mysqlconnect.php";
+    })
+    (dockerNodeTest {
+      description = "Test mysqlconnect with old password hash";
+      action = "succeed";
+      command = "curl http://${domain}/mysqlconnect.php | grep success";
     })
   ];
 } { }
