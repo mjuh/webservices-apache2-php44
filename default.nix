@@ -27,32 +27,7 @@ rootfs = mkRootfs {
   libstdcxx = gcc-unwrapped.lib;
 };
 
-dockerArgHints = {
-    init = false;
-    read_only = true;
-    network = "host";
-    environment = { HTTPD_PORT = "$SOCKET_HTTP_PORT"; PHP_SECURITY = "${rootfs}/etc/phpsec/$SECURITY_LEVEL"; };
-    tmpfs = [
-      "/tmp:mode=1777"
-      "/run/bin:exec,suid"
-      "/run/php44.d:mode=644"
-    ];
-    ulimits = [
-      { name = "stack"; hard = -1; soft = -1; }
-    ];
-    security_opt = [ "apparmor:unconfined" ];
-    cap_add = [ "SYS_ADMIN" ];
-    volumes = [
-      ({ type = "bind"; source =  "$SITES_CONF_PATH" ; target = "/read/sites-enabled"; read_only = true; })
-      ({ type = "bind"; source =  "/opt/etc"; target = "/opt/etc"; read_only = true;})
-      ({ type = "bind"; source = "/opcache"; target = "/opcache"; })
-      ({ type = "bind"; source = "/home"; target = "/home"; })
-      ({ type = "bind"; source = "/opt/postfix/spool/maildrop"; target = "/var/spool/postfix/maildrop"; })
-      ({ type = "bind"; source = "/opt/postfix/spool/public"; target = "/var/spool/postfix/public"; })
-      ({ type = "bind"; source = "/opt/postfix/lib"; target = "/var/lib/postfix"; })
-      ({ type = "tmpfs"; target = "/run"; })
-    ];
-  };
+php44DockerArgHints = lib.phpDockerArgHints php44;
 
 in 
 
@@ -88,8 +63,8 @@ pkgs.dockerTools.buildLayeredImage rec {
       "LC_ALL=en_US.UTF-8"
     ];
     Labels = flattenSet rec {
-      ru.majordomo.docker.arg-hints-json = builtins.toJSON dockerArgHints;
-      ru.majordomo.docker.cmd = dockerRunCmd dockerArgHints "${name}:${tag}";
+      ru.majordomo.docker.arg-hints-json = builtins.toJSON php44DockerArgHints;
+      ru.majordomo.docker.cmd = dockerRunCmd php44DockerArgHints "${name}:${tag}";
       ru.majordomo.docker.exec.reload-cmd = "${apacheHttpd}/bin/httpd -d ${rootfs}/etc/httpd -k graceful";
     };
   };
@@ -108,5 +83,4 @@ pkgs.dockerTools.buildLayeredImage rec {
       ln -s /bin usr/sbin
       ln -s /bin usr/local/bin
     '';
-
 }
