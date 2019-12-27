@@ -19,7 +19,6 @@ in maketestPhp {
   inherit debug;
   rootfs = ./rootfs;
   inherit containerStructureTestConfig;
-  defaultTestSuite = false;
   testSuite = [
     (dockerNodeTest {
       description = "Copy phpinfo.";
