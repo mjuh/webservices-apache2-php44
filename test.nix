@@ -114,13 +114,6 @@ in maketestPhp {
       '';
     })
     (dockerNodeTest {
-      description = "stat /tmp";
-      action = "succeed";
-      command = ''#!{bash}/bin/bash
-          docker exec `docker ps --format '{{ .Names }}' ` stat /tmp | grep 1777
-      '';
-    })
-    (dockerNodeTest {
       description = "Spiner test";
       action = "succeed";
       command = runCurlGrep "127.0.0.1" "refresh";
