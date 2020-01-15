@@ -27,7 +27,7 @@ rootfs = mkRootfs {
   libstdcxx = gcc-unwrapped.lib;
 };
 
-php44DockerArgHints = lib.phpDockerArgHints php44;
+php44DockerArgHints = lib.phpDockerArgHints { php = php44; };
 
 in 
 
