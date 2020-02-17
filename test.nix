@@ -60,7 +60,7 @@ in maketestPhp {
       command = testDiffPy {
         inherit pkgs;
         sampleJson = (./tests/. + "/${phpVersion}.json");
-        output = "/tmp/xchg/coverage-data/deepdiff.html";
+        output = "/tmp/xchg/coverage-data/deepdiff.json";
       };
     })
     (dockerNodeTest {
