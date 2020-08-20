@@ -18,7 +18,7 @@ inherit (stdenv) mkDerivation;
 rootfs = mkRootfs {
   name = "apache2-php44-rootfs";
   src = ./rootfs;
-  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php44 sendmail s6 execline zlib;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php44 sendmail s6 execline zlib logger;
   mjperl5Packages = mjperl5lib;
   ioncube = ioncube.v44;
   zendoptimizer = zendoptimizer.v44;
@@ -51,6 +51,7 @@ pkgs.dockerTools.buildLayeredImage rec {
     glibc
     zlib
     apacheHttpd
+    logger
     perl520
     mariadbConnectorC
   ]
