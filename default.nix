@@ -59,6 +59,7 @@ pkgs.dockerTools.buildLayeredImage rec {
       "TZDIR=${tzdata}/share/zoneinfo"
       "LOCALE_ARCHIVE_2_27=${locale}/lib/locale/locale-archive"
       "LC_ALL=en_US.UTF-8"
+      "LD_PRELOAD=${jemalloc}/lib/libjemalloc.so"
     ];
     Labels = flattenSet rec {
       ru.majordomo.docker.arg-hints-json = builtins.toJSON php44DockerArgHints;
