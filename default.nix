@@ -4,29 +4,28 @@ with nixpkgs;
 
 let
 
-  inherit (builtins) concatMap getEnv replaceStrings toJSON;
-  inherit (dockerTools) buildLayeredImage;
-  inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd mkRootfs;
-  inherit (lib.attrsets) collect isDerivation;
-  inherit (stdenv) mkDerivation;
+inherit (builtins) concatMap getEnv replaceStrings toJSON;
+inherit (dockerTools) buildLayeredImage;
+inherit (lib) concatMapStringsSep firstNChars flattenSet dockerRunCmd mkRootfs;
+inherit (lib.attrsets) collect isDerivation;
+inherit (stdenv) mkDerivation;
 
-  rootfs = mkRootfs {
-    name = "apache2-php44-rootfs";
-    src = ./rootfs;
-    inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd php44 sendmail s6 execline zlib logger;
-    mjHttpErrorPages = mj-http-error-pages;
-    mjperl5Packages = mjperl5lib;
-    ioncube = ioncube.v44;
-    zendoptimizer = zendoptimizer.v44;
-    s6PortableUtils = s6-portable-utils;
-    s6LinuxUtils = s6-linux-utils;
-    mimeTypes = mime-types;
-    libstdcxx = gcc-unwrapped.lib;
-  };
+rootfs = mkRootfs {
+  name = "apache2-php44-rootfs";
+  src = ./rootfs;
+  inherit curl coreutils findutils apacheHttpdmpmITK apacheHttpd mjHttpErrorPages php44 sendmail s6 execline zlib logger;
+  mjperl5Packages = mjperl5lib;
+  ioncube = ioncube.v44;
+  zendoptimizer = zendoptimizer.v44;
+  s6PortableUtils = s6-portable-utils;
+  s6LinuxUtils = s6-linux-utils;
+  mimeTypes = mime-types;
+  libstdcxx = gcc-unwrapped.lib;
+};
 
-  php44DockerArgHints = lib.phpDockerArgHints { php = php44; };
+php44DockerArgHints = lib.phpDockerArgHints { php = php44; };
 
-in
+in 
 
 pkgs.dockerTools.buildLayeredImage rec {
   name = "docker-registry.intr/webservices/apache2-php44";
@@ -40,11 +39,9 @@ pkgs.dockerTools.buildLayeredImage rec {
     coreutils
     libjpeg_turbo
     jpegoptim
-    (optipng.override { inherit libpng; })
+    (optipng.override{ inherit libpng ;})
     imagemagick
-    gifsicle
-    nss-certs.unbundled
-    zip
+    gifsicle nss-certs.unbundled zip
     gcc-unwrapped.lib
     glibc
     zlib
@@ -53,8 +50,8 @@ pkgs.dockerTools.buildLayeredImage rec {
     perl520
     mariadbConnectorC
   ]
-  ++ collect isDerivation mjperl5Packages;
-  # ++ collect isDerivation php44Packages;
+  ++ collect isDerivation mjperl5Packages ;
+# ++ collect isDerivation php44Packages;
   config = {
     Entrypoint = [ "${rootfs}/init" ];
     Env = [
@@ -71,21 +68,21 @@ pkgs.dockerTools.buildLayeredImage rec {
       ru.majordomo.docker.exec.reload-cmd = "${apacheHttpd}/bin/httpd -d ${rootfs}/etc/httpd -k graceful";
     };
   };
-  extraCommands = ''
-    set -xe
-    ls
-    mkdir -p etc
-    mkdir -p bin
-    mkdir -p usr
-    chmod u+w usr
-    mkdir -p usr/local
-    mkdir -p opt
-    ln -s ${php44} opt/php4
-    ln -s ${php44} opt/php44 
-    ln -s /bin usr/bin
-    ln -s /bin usr/sbin
-    ln -s /bin usr/local/bin
-    mkdir tmp
-    chmod 1777 tmp
-  '';
+    extraCommands = ''
+      set -xe
+      ls
+      mkdir -p etc
+      mkdir -p bin
+      mkdir -p usr
+      chmod u+w usr
+      mkdir -p usr/local
+      mkdir -p opt
+      ln -s ${php44} opt/php4
+      ln -s ${php44} opt/php44 
+      ln -s /bin usr/bin
+      ln -s /bin usr/sbin
+      ln -s /bin usr/local/bin
+      mkdir tmp
+      chmod 1777 tmp
+    '';
 }
